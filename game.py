@@ -1,12 +1,12 @@
 class Player:
-    speed = 2
+    speed = 20
 
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
     def move_forward(self):
-        self.y -= self.speed
+        self.y -= self.speed 
 
     def move_left(self):
         self.x -= self.speed
