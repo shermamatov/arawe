@@ -90,5 +90,5 @@ class Game:
         for player in self.players.values():
             await self.send_all(player.get_pos())
             await self.send_all(player.get_vector())
-            await self.send_all(player.get_hp()
+            await self.send_all(player.get_hp())
 
