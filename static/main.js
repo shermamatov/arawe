@@ -6,26 +6,7 @@ const ctx = canvas.getContext("2d");
 // ctx.imageSmoothingQuality = "high"
 ctx.imageSmoothingEnabled = false;
 ctx.scale(4, 4);
-
-// const player = {
-//     x: 128,
-//     y: 128,
-//     speed: 1,
-//     frame: 0,
-// };
-
-const movement = {
-    forward: false,
-    backward: false,
-    left: false,
-    right: false,
-};
-
-const textures = {
-    player: [],
-    player_running: [],
-    enemy: [],
-};
+const socket = new WebSocket("ws://" + document.location.host);
 
 class Player {
     // item:
@@ -40,37 +21,54 @@ class Object {}
 
 class Shells {}
 
-const player = {};
+const player = {
+    x: 128,
+    y: 128,
+    speed: 1,
+    frame: 0,
+    stay: [],
+    textures: [],
+};
+
+// const player = {};
 const shells = {};
 const objects = {};
 const items = {};
 
+const movement = {
+    forward: false,
+    backward: false,
+    left: false,
+    right: false,
+};
+
+const textures = {
+    player: [],
+    player_running: [],
+    enemy: [],
+};
+
 function loadTextures() {
     let img;
-    for (let i = 0; i < 5; i++) {
+    for (let i = 1; i < 7; i++) {
         const image = new Image();
-        image.src = "/static/img/" + i + ".png";
+        image.src = "/static/img/Dacer/Dacer_Standing" + i + ".png";
         player.stay.push(image);
     }
 
-    for (let i = 1; i < 8; i++) {
+    for (let i = 1; i < 7; i++) {
         const img = new Image();
-        img.src = "/static/img/p" + i + ".png";
+        img.src = "/static/img/Dacer/Dacer_Runing" + i + ".png";
         player.textures.push(img);
         // enemy.textures.push(img)
     }
-    const image = new Image();
-    image.src = "/static/img/Tree.png";
-    enemy.textures[0] = image;
+    // console.log(player);
+    // const image = new Image();
+    // image.src = "/static/img/baground/Tree.png";
+    // enemy.textures[0] = image;
 }
-// console.log(width, height)
-// p2set2
-// p2use
-// set 2
-// p2use
 
 function render() {
-    // console.log(player.textures)
     ctx.fillStyle = "#1f1f1f";
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = "#0fef7f";
@@ -81,7 +79,7 @@ function render() {
         movement.right
     )
         ctx.drawImage(
-            player.textures[player.frame % 7],
+            player.textures[player.frame % 6],
             player.x,
             player.y,
             32,
@@ -89,25 +87,21 @@ function render() {
         );
     else
         ctx.drawImage(
-            player.stay[player.frame % 5],
+            player.stay[player.frame % 6],
             player.x,
             player.y,
             32,
             32
         );
-    ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
-
-    // for player in players
-    //   textures[]
+    // ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
 }
 
-// p2vec 1 1
-// p2vec 0 0
-// p2pos 40 40
-// p2pos 41 41
-// p2pos 42 42
-
-const socket = new WebSocket("ws://" + document.location.host);
+// function move() {
+//     if (movement.forward) player.y -= player.speed;
+//     if (movement.backward) player.y += player.speed;
+//     if (movement.left) player.x -= player.speed;
+//     if (movement.right) player.x += player.speed;
+// }
 
 function send_vector() {
     let x = 0,
@@ -118,10 +112,6 @@ function send_vector() {
     if (movement.backward) y += 1;
     socket.send(`vec ${x} ${y}`);
 }
-
-// p2hp:100
-// p2pos:10,10
-// p2hp:0
 
 function addEventListeners() {
     document.addEventListener("keyup", (event) => {
@@ -161,7 +151,7 @@ function addEventListeners() {
     });
 
     // socket.addEventListener("open", (event) => {});
-
+    loadTextures();
     socket.addEventListener("message", (event) => {
         // [msgType, x, y] = event.data.split(' ');
         render();
@@ -170,10 +160,10 @@ function addEventListeners() {
 
 function addIntervals() {
     setInterval(() => render(), 16);
-
     setInterval(() => {
-        if (frame == 7) player.frame = 0;
-        else player.frame++;
+        player.frame++;
+        // if (frame == 6) player.frame = 0;
+        // else player.frame++;
     }, 100);
 }
 
@@ -181,3 +171,5 @@ function main() {
     addEventListeners();
     addIntervals();
 }
+
+main();

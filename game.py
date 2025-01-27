@@ -35,7 +35,6 @@ class Game:
     registry: list[Player] = []
 
     async def loop(self):
-
         for p in self.registry:
             p.move()
         # send to clients

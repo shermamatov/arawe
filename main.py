@@ -20,7 +20,7 @@ class Server(WebSocketEndpoint):
 
     async def on_connect(self, websocket):
         await websocket.accept()
-        await websocket.send_text(game.get_state())
+        # await websocket.send_text(game.get_state())
 
     async def on_receive(self, websocket, data):
         print()
