@@ -30,15 +30,23 @@ class Player(Shell):
         self.x = randint(64, Game.width - 64)
         self.y = randint(64, Game.height - 64)
         self.id = self.get_id()
+        self.hp = 100
 
     def move(self):
         if self.dx or self.dy:
             self.x += self.dx * self.speed
             self.y += self.dy * self.speed
-            return self.x, self.y
+            return True
+        return False
 
     def get_pos(self):
         return f"{self}pos:{self.x},{self.y}"
+
+    def get_hp(self):
+        return f"{self}hp:{self.hp}"
+
+    def get_vector(self):
+        return f"{self}vec:{self.dx},{self.dy}"
 
     def set_vector(self, dx, dy):
         self.dx = dx
@@ -65,10 +73,8 @@ class Game:
     async def loop(self):
         while True:
             for player in self.players.values():
-                pos = player.move()
-                if pos:
-                    x, y = pos
-                    await self.send_all(f"{player}pos:{x},{y}")
+                if player.move():
+                    await self.send_all(player.get_pos())
             await sleep(33)
 
     async def set_vector(self, ws, dx, dy):
@@ -79,4 +85,10 @@ class Game:
     async def use(self, ws, dx=None, dy=None):
         player = self.players[ws]
         self.send_all(f"{player}use")
+
+    async def get_state(self):
+        for player in self.players.values():
+            await self.send_all(player.get_pos())
+            await self.send_all(player.get_vector())
+            await self.send_all(player.get_hp())
 
