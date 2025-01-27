@@ -7,24 +7,36 @@ const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 ctx.scale(4, 4);
 
-let msgType;
+// const player = {
+//     x: 128,
+//     y: 128,
+//     speed: 1,
+//     frame: 0,
+// };
 
-const player = {
-    x: 128,
-    y: 128,
-    speed: 1,
-    textures: [],
-    stay: [],
-    frame: 0,
+const textures = {
+    player: [],
+    player_running: [],
+    enemy: [],
 };
 
-const enemy = {
-    x: 256,
-    y: 128,
-    speed: 1,
-    textures: [],
-    frame: 0,
-};
+class Player {
+    // item:
+    // dx: 0,
+    // dy: 1,
+    use() {
+        // ...
+    }
+}
+
+class Object {}
+
+class Shells {}
+
+const player = {};
+const shells = {};
+const objects = {};
+const items = {};
 
 for (let i = 0; i < 5; i++) {
     const image = new Image();
@@ -42,6 +54,10 @@ const image = new Image();
 image.src = "/static/img/Tree.png";
 enemy.textures[0] = image;
 // console.log(width, height)
+// p2set2
+// p2use
+// set 2
+// p2use
 
 const movement = {
     forward: false,
@@ -79,78 +95,84 @@ function render() {
             32
         );
     ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
+
+    // for player in players
+    //   textures[]
 }
+
+// p2vec 1 1
+// p2vec 0 0
+// p2pos 40 40
+// p2pos 41 41
+// p2pos 42 42
 
 const socket = new WebSocket("ws://" + document.location.host);
 
-// socket.addEventListener("open", (event) => {});
-
-socket.addEventListener("message", (event) => {
-    // [msgType, x, y] = event.data.split(' ');
-
-    render();
-});
-
-document.addEventListener("keydown", (event) => {
-    switch (event.code) {
-        case "KeyW":
-            movement.forward = true;
-            // socket.send("move_forward")
-            break;
-        case "KeyA":
-            movement.left = true;
-            // socket.send("move_left")
-            break;
-        case "KeyS":
-            movement.backward = true;
-            // socket.send("move_backward")
-            break;
-        case "KeyD":
-            // socket.send("move_right")
-            movement.right = true;
-            break;
-    }
-});
-
-document.addEventListener("keyup", (event) => {
-    switch (event.code) {
-        case "KeyW":
-            movement.forward = false;
-            // socket.send("move_forward")
-            break;
-        case "KeyA":
-            movement.left = false;
-            // socket.send("move_left")
-            break;
-        case "KeyS":
-            movement.backward = false;
-            // socket.send("move_backward")
-            break;
-        case "KeyD":
-            // socket.send("move_right")
-            movement.right = false;
-            break;
-    }
-});
-
-function move() {
-    if (movement.forward) player.y -= player.speed;
-    if (movement.backward) player.y += player.speed;
-    if (movement.left) player.x -= player.speed;
-    if (movement.right) player.x += player.speed;
+function send_vector() {
+    let x = 0,
+        y = 0;
+    if (movement.left) x -= 1;
+    if (movement.right) x += 1;
+    if (movement.forward) y -= 1;
+    if (movement.backward) y += 1;
+    socket.send(`vec ${x} ${y}`);
 }
 
-setInterval(() => {
-    render();
-    move();
-}, 16);
+function addEventListeners() {
+    document.addEventListener("keyup", (event) => {
+        switch (event.code) {
+            case "KeyW":
+                movement.forward = false;
+                break;
+            case "KeyA":
+                movement.left = false;
+                break;
+            case "KeyS":
+                movement.backward = false;
+                break;
+            case "KeyD":
+                movement.right = false;
+                break;
+        }
+        send_vector();
+    });
 
-setInterval(() => {
-    player.frame += 1;
-    // if (movement.forward || movement.backward || movement.left || movement.right) {
-    //   if (player.frame > 7)
-    //     player.frame = 0
-    // } else {
-    //   if (player.frame > 5)
-    //     player.frame = 0
-}, 100);
+    document.addEventListener("keydown", (event) => {
+        switch (event.code) {
+            case "KeyW":
+                movement.forward = true;
+                break;
+            case "KeyA":
+                movement.left = true;
+                break;
+            case "KeyS":
+                movement.backward = true;
+                break;
+            case "KeyD":
+                movement.right = true;
+                break;
+        }
+        send_vector();
+    });
+
+    // socket.addEventListener("open", (event) => {});
+
+    socket.addEventListener("message", (event) => {
+        // [msgType, x, y] = event.data.split(' ');
+        render();
+    });
+}
+
+function addIntervals() {
+    setInterval(() => render(), 16);
+
+    setInterval(() => {
+        if (frame == 7) player.frame = 0;
+        else player.frame++;
+    }, 100);
+}
+
+function main() {
+    addEventListeners();
+    addIntervals();
+}
