@@ -14,6 +14,13 @@ const player = {
   frame: 0
 }
 
+const movement = {
+  forward: false,
+  backward: false,
+  left: false,
+  right: false
+}
+
 const textures = {
   player: [],
   player_running: [],
@@ -41,6 +48,9 @@ const shells = {}
 const objects = {}
 const items = {}
 
+
+function loadTextures() {
+  let img;
   for (let i = 0; i < 5; i++) {
     const image = new Image()
     image.src = "/static/img/" + i + ".png"
@@ -56,18 +66,12 @@ const items = {}
   const image = new Image()
   image.src = "/static/img/Tree.png"
   enemy.textures[0] = image
+}
 // console.log(width, height)
 // p2set2
 // p2use
 // set 2
 // p2use
-
-const movement = {
-  forward: false,
-  backward: false,
-  left: false,
-  right: false
-}
 
 function render() {
   // console.log(player.textures)
@@ -106,6 +110,10 @@ function send_vector() {
     y += 1
   socket.send(`vec ${x} ${y}`)
 }
+
+// p2hp:100
+// p2pos:10,10
+// p2hp:0
 
 
 function addEventListeners() {

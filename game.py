@@ -1,3 +1,8 @@
+from asyncio import sleep
+
+from starlette.websockets import WebSocket
+
+
 class Object:
     x: float
     y: float
@@ -30,8 +35,13 @@ class Game:
     height = 3200
     registry: list[Player] = []
 
-    async def loop(self):
+    def loop(self):
+
         for p in self.registry:
             p.move()
         # send to clients
         await sleep(33)
+
+    async def send_clients(self, msg):
+        WebSocket
+        
