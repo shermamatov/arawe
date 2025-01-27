@@ -2,6 +2,21 @@
 
 Future domain: dust.dayrain.uk
 
+## Protocol
+
+### Server to Client
+
+- `pNset:id(int)` - player set item
+- `pNpos:x(int),y(int)` - player changed position
+- `pNuse:dx[-1;1],dy[-1;1]` - player used item
+- `pNvec:dx[-1;1],[-1;1]` - player changed vector
+
+### Client to Server
+
+- `set:id(int)` - set item
+- `use:dx[-1;1],dy[-1;1]` - use item
+- `vec:[-1;1],[-1;1]` - change vector
+
 ## TODO
 
 - [ ] Protocol
@@ -17,7 +32,6 @@ Future domain: dust.dayrain.uk
   - [ ] Protocol implementation
 - [ ] Client
   - [ ] Render
-    - [ ] Frame per second
   - [ ] Control of actions
   - [ ] Protocol implementation
   - [ ] Settings
