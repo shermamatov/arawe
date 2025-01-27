@@ -1,3 +1,4 @@
+from asyncio import sleep, create_task
 from contextlib import asynccontextmanager
 
 from starlette.applications import Starlette
@@ -50,8 +51,9 @@ class Server(WebSocketEndpoint):
 
 @asynccontextmanager
 async def lifespan(app):
-    await game.loop()
+    task = create_task(game.loop())
     yield
+    task.cancel()
 
 
 app = Starlette(
@@ -60,5 +62,6 @@ app = Starlette(
         Route('/', index),
         Mount('/static', app=StaticFiles(directory="static")),
         WebSocketRoute('/', Server)
-    )
+    ),
+    lifespan=lifespan
 )

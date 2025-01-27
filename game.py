@@ -63,32 +63,32 @@ class Game:
         await ws.send_text(player.get_pos())
 
     async def del_player(self, ws: WebSocket):
-        player = self.players[ws].pop(ws)
-        self.send_all(f"{player}hp:0")
+        player = self.players.pop(ws)
+        await self.send_all(f"{player}hp:0")
 
     async def send_all(self, msg: str):
         for ws in self.players:
             await ws.send_text(msg)
 
-    async def loop(self):
-        while True:
-            for player in self.players.values():
-                if player.move():
-                    await self.send_all(player.get_pos())
-            await sleep(33)
-
     async def set_vector(self, ws, dx, dy):
         player = self.players[ws]
         player.set_vector(dx, dy)        
-        self.send_all(f"{player}vec:{dx},{dy}")
+        await self.send_all(f"{player}vec:{dx},{dy}")
 
     async def use(self, ws, dx=None, dy=None):
         player = self.players[ws]
-        self.send_all(f"{player}use")
+        await self.send_all(f"{player}use")
 
     async def get_state(self):
         for player in self.players.values():
             await self.send_all(player.get_pos())
             await self.send_all(player.get_vector())
             await self.send_all(player.get_hp())
+
+    async def loop(self):
+        while True:
+            for player in self.players.values():
+                if player.move():
+                    await self.send_all(player.get_pos())
+            await sleep(0.03)
 

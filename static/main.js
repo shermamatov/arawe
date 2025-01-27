@@ -154,6 +154,7 @@ function addEventListeners() {
     loadTextures();
     socket.addEventListener("message", (event) => {
         // [msgType, x, y] = event.data.split(' ');
+        console.log(event.data)
         render();
     });
 }
