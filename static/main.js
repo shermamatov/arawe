@@ -30,7 +30,6 @@ const player = {
     textures: [],
 };
 
-// const player = {};
 const shells = {};
 const objects = {};
 const items = {};
@@ -153,6 +152,8 @@ function addEventListeners() {
     // socket.addEventListener("open", (event) => {});
     loadTextures();
     socket.addEventListener("message", (event) => {
+        requestArr = event.split(":");
+        // if()
         // [msgType, x, y] = event.data.split(' ');
         render();
     });
