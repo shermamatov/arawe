@@ -50,6 +50,8 @@ const movement = {
     right: false,
 };
 
+function send_vector() {}
+
 function render() {
     // console.log(player.textures)
     ctx.fillStyle = "#1f1f1f";

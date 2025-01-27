@@ -15,7 +15,7 @@ class Player(Shell):
         self.x = x
         self.y = y
 
-    def move(self, vector_x, vecotr_y):
+    def move(self, vector_x, vector_y):
         self.x += vector_x * self.speed
         self.y += vector_y * self.speed
 
