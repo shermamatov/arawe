@@ -20,8 +20,9 @@ class Server(WebSocketEndpoint):
     encoding = "text"
 
     async def on_connect(self, ws):
-        await websocket.accept()
+        await ws.accept()
         await game.add_player(ws)
+        await game.get_state()
 
     async def on_receive(self, ws, data):
         if data.startswith("vec"):
