@@ -2,7 +2,7 @@
 
 Future domain: dust.dayrain.uk
 
-## Protocol
+## Protocol V1
 
 ### Server to Client
 

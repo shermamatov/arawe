@@ -96,13 +96,6 @@ function render() {
     // ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
 }
 
-// function move() {
-//     if (movement.forward) player.y -= player.speed;
-//     if (movement.backward) player.y += player.speed;
-//     if (movement.left) player.x -= player.speed;
-//     if (movement.right) player.x += player.speed;
-// }
-
 function send_vector() {
     let x = 0,
         y = 0;
@@ -110,7 +103,7 @@ function send_vector() {
     if (movement.right) x += 1;
     if (movement.forward) y -= 1;
     if (movement.backward) y += 1;
-    socket.send(`vec ${x} ${y}`);
+    socket.send(`vec:${x},${y}`);
 }
 
 function addEventListeners() {
@@ -118,36 +111,43 @@ function addEventListeners() {
         switch (event.code) {
             case "KeyW":
                 movement.forward = false;
+                send_vector();
                 break;
             case "KeyA":
                 movement.left = false;
+                send_vector();
                 break;
             case "KeyS":
                 movement.backward = false;
+                send_vector();
                 break;
             case "KeyD":
                 movement.right = false;
+                send_vector();
                 break;
         }
-        send_vector();
     });
 
     document.addEventListener("keydown", (event) => {
         switch (event.code) {
             case "KeyW":
                 movement.forward = true;
+                send_vector();
                 break;
             case "KeyA":
                 movement.left = true;
+                send_vector();
                 break;
             case "KeyS":
                 movement.backward = true;
+                send_vector();
                 break;
             case "KeyD":
                 movement.right = true;
+                send_vector();
                 break;
         }
-        send_vector();
+        // send_vector();
     });
 
     // socket.addEventListener("open", (event) => {});
