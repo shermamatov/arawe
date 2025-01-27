@@ -15,12 +15,23 @@ class Player(Shell):
         self.x = x
         self.y = y
 
-    def move(self, vector_x, vecotr_y):
-        self.x += vector_x * self.speed
-        self.y += vector_y * self.speed
+    def move(self):
+        self.x += self.dx * self.speed
+        self.y += self.dy * self.speed
+        return self.x, self.y
+
+    def set_vector(self, dx, dy):
+        self.dx = dx
+        self.dy = dy
 
 
 class Game:
     width = 3200
     height = 3200
     registry: list[Player] = []
+
+    async def loop(self):
+        for p in self.registry:
+            p.move()
+        # send to clients
+        await sleep(33)
