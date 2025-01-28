@@ -1,8 +1,8 @@
-# Dust
+# Awe
 
-Future domain: dust.dayrain.uk
+Future domain: awe.dayrain.uk
 
-## Protocol V1
+## Protocol 
 
 ### Server to Client
 
@@ -15,14 +15,16 @@ Future domain: dust.dayrain.uk
 ### Client to Server
 
 - `set:id(int)` - set item
-- `use:dx[-1;1],dy[-1;1]` - use item
-- `vec:[-1;1],[-1;1]` - change vector
+- `use:dx(float)[-1;1],dy(float)[-1;1]` - use item
+- `vec:dx(float)[-1;1],dy(float)[-1;1]` - change vector
 
 ## TODO
 
 - [ ] Protocol
 - [ ] Pixel art animations
-  - [ ] Player model
+  - [x] Player model
+  - [x] Sword model
+  - [ ] Next gen animations
 - [ ] Game engine
   - [ ] Multiple players
   - [ ] Player actions
