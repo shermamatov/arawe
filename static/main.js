@@ -20,10 +20,19 @@ class Player {
     right = 0;
 }
 
+class SwordUse {
+    constructor(right, player) {
+        this.right = right
+        this.player = player
+        this.frame = 0;
+    }
+}
+
 const players = {};
 const shells = {};
 const objects = {};
 const items = {};
+const events = [];
 
 const movement = {
     forward: false,
@@ -35,6 +44,7 @@ const movement = {
 const textures = {
     player_staying: [[], []],
     player_running: [[], []],
+    sword: [[], []]
 };
 
 function loadTextures() {
@@ -52,6 +62,12 @@ function loadTextures() {
         img = new Image();
         img.src = "/static/img/Dacer/Dacer_Runing_Right" + i + ".png";
         textures.player_running[1].push(img);
+        img = new Image();
+        img.src = "/static/img/weapoons/bladE_Left" + i + ".png";
+        textures.sword[0].push(img);
+        img = new Image();
+        img.src = "/static/img/weapoons/blade_Righ" + i + ".png";
+        textures.sword[1].push(img);
         // enemy.textures.push(img)
     }
 
@@ -88,6 +104,25 @@ function render() {
                 32
             );
     }
+
+    for (let i = 0; i < events.length;) {
+        let event = events[i]
+        // console.log(+event.player.right, event.frame)
+        if (event.frame == 6) {
+            events.pop(i)
+        } else {
+            ctx.drawImage(
+                textures.sword[+event.right][event.frame],
+                player.x,
+                player.y,
+                32,
+                32
+            );
+            event.frame++;
+            i++
+        }
+    }
+
     // ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
 }
 
@@ -145,6 +180,12 @@ function addEventListeners() {
         // send_vector();
     });
 
+    document.addEventListener("mousedown", (event) => {
+        if (!event.button) {
+            socket.send("use");
+        }
+    })
+
     // socket.addEventListener("open", (event) => {});
     loadTextures();
     socket.addEventListener("message", (event) => {
@@ -152,25 +193,26 @@ function addEventListeners() {
         let player = players[msg[1]]
         if (!player)
             player = players[msg[1]] = new Player()
-        if (msg.length === 4) {
-            if (msg[2] == "pos") {
-                [x, y] = msg[3].split(",");
-                player.x = x;
-                player.y = y;
-            } else if (msg[2] == "vec") {
-                [x, y] = msg[3].split(",");
-                player.state = x != 0 || y != 0;
-                if (x != 0)
-                    player.right = x == 1;
-            }
+        let cmd = msg[2]
+        if (cmd == "pos") {
+            [x, y] = msg[3].split(",");
+            player.x = x;
+            player.y = y;
+        } else if (cmd == "vec") {
+            [x, y] = msg[3].split(",");
+            player.state = x != 0 || y != 0;
+            if (x != 0)
+                player.right = x == 1;
+        } else if (cmd == "use") {
+            events.push(new SwordUse(+player.right, player))
         }
         // console.log(event.data);
-        render();
+        // render();
     });
 }
 
 function addIntervals() {
-    setInterval(() => render(), 16);
+    setInterval(() => render(), 32);
     setInterval(() => {
         if (frame == 5) {
             frame = 0;
