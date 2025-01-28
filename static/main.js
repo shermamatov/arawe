@@ -13,27 +13,32 @@ const socket = new WebSocket("ws://" + document.location.host);
 let frame = 0;
 //!  constants end
 
-// class Player {
-//     // item:
-//     // dx: 0,
-//     // dy: 1,
-//     use() {
-//         // ...
-//     }
-// }
+class Player {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.state = 0;
+    }
+    // item:
+    // dx: 0,
+    // dy: 1,
+    use() {
+        // ...
+    }
+}
 
 class Object {}
 
 class Shells {}
+const clientId = null;
+// const player = {
+//     x: 128,
+//     y: 128,
+//     state: 0,
 
-const player = {
-    x: 128,
-    y: 128,
-    state: 0,
+//     dx: 0,
 
-    dx: 0,
-};
-// const player = Player {}
+const player = Player;
 const shells = {};
 const objects = {};
 const items = {};
@@ -164,9 +169,10 @@ function addEventListeners() {
                 player.state = x != 0 || y != 0;
                 player.dx = x;
             }
+        } else if (msg.length == 2) {
+            clientId = msg[1];
         }
-        // [msgType, x, y] = event.data.split(' ');
-        console.log(event.data);
+        // console.log(event.data);
         render();
     });
 }
