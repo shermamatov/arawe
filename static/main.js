@@ -1,12 +1,15 @@
-const canvas = document.createElement("canvas");
 const width = (canvas.width = document.body.clientWidth);
 const height = (canvas.height = document.body.clientHeight);
+const canvas = document.createElement("canvas");
 document.body.append(canvas);
+
 const ctx = canvas.getContext("2d");
-// ctx.imageSmoothingQuality = "high"
 ctx.imageSmoothingEnabled = false;
 ctx.scale(4, 4);
+
 const socket = new WebSocket("ws://" + document.location.host);
+
+//!  constants end
 
 class Player {
     // item:
