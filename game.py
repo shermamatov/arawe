@@ -15,7 +15,7 @@ class Shell(Object):
 
 
 class Player(Shell):
-    speed = 1
+    speed = 2
     id = 0
 
     @classmethod
@@ -27,8 +27,10 @@ class Player(Shell):
         return 'p:' + str(self.id)
 
     def __init__(self):
-        self.x = randint(64, Game.width - 64)
-        self.y = randint(64, Game.height - 64)
+        # self.x = randint(64, Game.width - 64)
+        # self.y = randint(64, Game.height - 64)
+        self.x = 64
+        self.y = 64
         self.id = self.get_id()
         self.hp = 100
 

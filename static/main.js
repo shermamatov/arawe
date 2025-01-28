@@ -1,6 +1,8 @@
-const width = (canvas.width = document.body.clientWidth);
-const height = (canvas.height = document.body.clientHeight);
 const canvas = document.createElement("canvas");
+const width = document.body.clientWidth;
+const height = document.body.clientHeight;
+canvas.width = width;
+canvas.height = height;
 document.body.append(canvas);
 
 const ctx = canvas.getContext("2d");
@@ -8,17 +10,17 @@ ctx.imageSmoothingEnabled = false;
 ctx.scale(4, 4);
 
 const socket = new WebSocket("ws://" + document.location.host);
-
+let frame = 0;
 //!  constants end
 
-class Player {
-    // item:
-    // dx: 0,
-    // dy: 1,
-    use() {
-        // ...
-    }
-}
+// class Player {
+//     // item:
+//     // dx: 0,
+//     // dy: 1,
+//     use() {
+//         // ...
+//     }
+// }
 
 class Object {}
 
@@ -27,12 +29,11 @@ class Shells {}
 const player = {
     x: 128,
     y: 128,
-    speed: 1,
-    frame: 0,
-    stay: [],
-    textures: [],
-};
+    state: 0,
 
+    dx: 0,
+};
+// const player = Player {}
 const shells = {};
 const objects = {};
 const items = {};
@@ -45,7 +46,7 @@ const movement = {
 };
 
 const textures = {
-    player: [],
+    player_staying: [],
     player_running: [],
     enemy: [],
 };
@@ -53,17 +54,16 @@ const textures = {
 function loadTextures() {
     let img;
     for (let i = 1; i < 7; i++) {
-        const image = new Image();
-        image.src = "/static/img/Dacer/Dacer_Standing" + i + ".png";
-        player.stay.push(image);
-    }
-
-    for (let i = 1; i < 7; i++) {
-        const img = new Image();
+        img = new Image();
+        img.src = "/static/img/Dacer/Dacer_Standing" + i + ".png";
+        textures.player_staying.push(img);
+        img = new Image();
         img.src = "/static/img/Dacer/Dacer_Runing" + i + ".png";
-        player.textures.push(img);
+        textures.player_running.push(img);
         // enemy.textures.push(img)
     }
+
+    for (let i = 1; i < 7; i++) {}
     // console.log(player);
     // const image = new Image();
     // image.src = "/static/img/baground/Tree.png";
@@ -74,14 +74,11 @@ function render() {
     ctx.fillStyle = "#1f1f1f";
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = "#0fef7f";
-    if (
-        movement.forward ||
-        movement.backward ||
-        movement.left ||
-        movement.right
-    )
+    // console.log(player);
+
+    if (player.state)
         ctx.drawImage(
-            player.textures[player.frame % 6],
+            textures.player_running[frame % 6],
             player.x,
             player.y,
             32,
@@ -89,12 +86,13 @@ function render() {
         );
     else
         ctx.drawImage(
-            player.stay[player.frame % 6],
+            textures.player_staying[frame % 6],
             player.x,
             player.y,
             32,
             32
         );
+    ctx.restore();
     // ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
 }
 
@@ -155,10 +153,20 @@ function addEventListeners() {
     // socket.addEventListener("open", (event) => {});
     loadTextures();
     socket.addEventListener("message", (event) => {
-        requestArr = event.split(":");
-
+        let msg = event.data.split(":");
+        if (msg.length === 4) {
+            if (msg[2] == "pos") {
+                [x, y] = msg[3].split(",");
+                player.x = x;
+                player.y = y;
+            } else if (msg[2] == "vec") {
+                [x, y] = msg[3].split(",");
+                player.state = x != 0 || y != 0;
+                player.dx = x;
+            }
+        }
         // [msgType, x, y] = event.data.split(' ');
-        console.log(event.data)
+        console.log(event.data);
         render();
     });
 }
@@ -166,9 +174,11 @@ function addEventListeners() {
 function addIntervals() {
     setInterval(() => render(), 16);
     setInterval(() => {
-        player.frame++;
-        // if (frame == 6) player.frame = 0;
-        // else player.frame++;
+        if (frame == 5) {
+            frame = 0;
+        } else {
+            frame++;
+        }
     }, 100);
 }
 
