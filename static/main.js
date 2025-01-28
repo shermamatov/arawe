@@ -153,7 +153,7 @@ function addEventListeners() {
     loadTextures();
     socket.addEventListener("message", (event) => {
         requestArr = event.split(":");
-        // if()
+
         // [msgType, x, y] = event.data.split(' ');
         render();
     });
