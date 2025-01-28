@@ -60,7 +60,7 @@ class Game:
 
     async def add_player(self, ws: WebSocket):
         self.players[ws] = player = Player()
-        await ws.send_text(player.get_pos())
+        await ws.send_text(str(player))
 
     async def del_player(self, ws: WebSocket):
         player = self.players.pop(ws)

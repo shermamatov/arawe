@@ -6,10 +6,11 @@ Future domain: dust.dayrain.uk
 
 ### Server to Client
 
-- `pNset:id(int)` - player set item
-- `pNpos:x(int),y(int)` - player changed position
-- `pNuse:dx[-1;1],dy[-1;1]` - player used item
-- `pNvec:dx[-1;1],[-1;1]` - player changed vector
+- `p:n(int)` - client id (init)
+- `p:n(int):set:id(int)` - player set item
+- `p:n(int):pos:x(int),y(int)` - player changed position
+- `p:n(int):use:dx(float)[-1;1],dy(float)[-1;1]` - player used item
+- `p:n(int):vec:dx(float)[-1;1],dy(float)[-1;1]` - player changed vector
 
 ### Client to Server
 
