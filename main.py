@@ -13,6 +13,19 @@ from game import Game
 game = Game()
 
 
+def vector(i):
+    if i.startswith("-"):
+        mod = i[1:]
+    else:
+        mod = i
+    if not mod.isdigit():
+        return None
+    i = int(i)
+    if i < -1 or i > 1:
+        return None
+    return i
+
+
 async def index(request):
     return FileResponse("index.html")
 
@@ -37,14 +50,10 @@ class Server(WebSocketEndpoint):
                 return
             if len(args) != 2:
                 return
-            dx, dy = args
-            for i in dx, dy:
-                if i.startswith("-"):
-                    mod = i[1:]
-                else:
-                    mod = i
-                if i < -1 or i > 1:
-                    return
+            dx = vector(args[0])
+            dy = vector(args[1])
+            if dx is None or dy is None:
+                return
             await game.set_vector(ws, dx, dy)
     
     async def on_disconnect(self, ws, close_code):
