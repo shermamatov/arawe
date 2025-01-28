@@ -1,3 +1,4 @@
+from asyncio import sleep, create_task
 from contextlib import asynccontextmanager
 
 from starlette.applications import Starlette
@@ -10,6 +11,19 @@ from game import Game
 
 
 game = Game()
+
+
+def vector(i):
+    if i.startswith("-"):
+        mod = i[1:]
+    else:
+        mod = i
+    if not mod.isdigit():
+        return None
+    i = int(i)
+    if i < -1 or i > 1:
+        return None
+    return i
 
 
 async def index(request):
@@ -25,24 +39,22 @@ class Server(WebSocketEndpoint):
         await game.get_state()
 
     async def on_receive(self, ws, data):
-        if data.startswith("vec"):
+        if data == "use":
+            await game.use(ws)
+        else:
             msg = data.split(':')
             if len(msg) != 2:
                 return
             cmd, args = msg[0], msg[1].split(',')
+            if cmd != "vec":
+                return
             if len(args) != 2:
                 return
-            dx, dy = args
-            if not dx.isdigit() or not dy.isdigit():
+            dx = vector(args[0])
+            dy = vector(args[1])
+            if dx is None or dy is None:
                 return
-            dx = int(dx)
-            dy = int(dy)
-            for i in dx, dy:
-                if i < -1 or i > 1:
-                    return
             await game.set_vector(ws, dx, dy)
-        elif data == "use":
-            await game.use(ws)
     
     async def on_disconnect(self, ws, close_code):
         await game.del_player(ws)
@@ -50,7 +62,7 @@ class Server(WebSocketEndpoint):
 
 @asynccontextmanager
 async def lifespan(app):
-    await game.loop()
+    task = create_task(game.loop())
     yield
 
 
@@ -60,5 +72,6 @@ app = Starlette(
         Route('/', index),
         Mount('/static', app=StaticFiles(directory="static")),
         WebSocketRoute('/', Server)
-    )
+    ),
+    lifespan=lifespan
 )

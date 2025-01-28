@@ -158,6 +158,7 @@ function addEventListeners() {
         requestArr = event.split(":");
 
         // [msgType, x, y] = event.data.split(' ');
+        console.log(event.data)
         render();
     });
 }
