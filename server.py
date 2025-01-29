@@ -24,6 +24,7 @@ class Server(WebSocketEndpoint):
     width = 640
     height = 640
     players: dict[WebSocket, Player] = {}
+    active_players: list[Player] = []
 
     @classmethod
     async def send_all(cls, msg: str):
@@ -35,25 +36,30 @@ class Server(WebSocketEndpoint):
             player.use = 16
             await self.send_all(f"{player}:use")
 
-            for enemy in self.players.values():
+            for enemy in reversed(self.active_players):
                 if enemy is player:
                     continue
 
-                px0 = player.x
                 px1 = player.x + 16 * player.dir
                 py0 = player.y - 16
                 py1 = player.y + 16
 
-                ex0 = enemy.x - 8
-                ex1 = enemy.x + 8
+                if px1 > player.x:
+                    px0 = player.x
+                else:
+                    px0, px1 = px1, player.x
+
+                ex0 = enemy.x - 4
+                ex1 = enemy.x + 4
                 ey0 = enemy.y - 16
                 ey1 = enemy.y + 16
 
-                if (((px0 <= ex0 and ex0 <= px1) or (px0 <= ex1 and ex1 <= px1))
-                    and (py0 <= ey0 and ey0 <= py1) or (py0 <= ey1 and ey1 <= py1)):
+                if (((px0 <= ex0 <= px1) or (px0 <= ex1 <= px1))
+                    and ((py0 <= ey0 <= py1) or (py0 <= ey1 <= py1))):
                     enemy.hp -= 10
-                    await self.send_all(player.get_hp())
-                
+                    await self.send_all(enemy.get_hp())
+                    if not enemy.hp:
+                        self.active_players.remove(enemy)
 
     async def get_state(self):
         for player in self.players.values():
@@ -73,7 +79,8 @@ class Server(WebSocketEndpoint):
     async def on_connect(self, ws):
         if len(self.players) < 50:
             await ws.accept()
-            self.players[ws] = Player(64, 64)
+            self.players[ws] = player = Player(64, 64)
+            self.active_players.append(player)
             await self.get_state()
 
     async def on_receive(self, ws, data):
