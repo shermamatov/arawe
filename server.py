@@ -33,7 +33,7 @@ class Server(WebSocketEndpoint):
 
     async def use(self, player, dx=None, dy=None):
         if not player.use:
-            player.use = 16
+            player.use = 8
             await self.send_all(f"{player}:use")
 
             for enemy in reversed(self.active_players):
