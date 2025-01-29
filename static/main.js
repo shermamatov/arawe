@@ -16,14 +16,15 @@ let frame = 0;
 class Player {
     x = null;
     y = null;
-    state =  0;
+    state = 0;
     right = 0;
-    use = null
+    use = null;
+    hp = 10;
 }
 
 class SwordUse {
     constructor(right) {
-        this.right = right
+        this.right = right;
         this.frame = 0;
     }
 }
@@ -43,7 +44,7 @@ const movement = {
 const textures = {
     player_staying: [[], []],
     player_running: [[], []],
-    sword: [[], []]
+    sword: [[], []],
 };
 
 function loadTextures() {
@@ -83,9 +84,9 @@ function render() {
     ctx.fillStyle = "#0fef7f";
     // console.log(player);
 
-    let player
+    let player;
     for (const id of Object.keys(players)) {
-        player = players[id]
+        player = players[id];
         if (player.state)
             ctx.drawImage(
                 textures.player_running[+player.right][frame % 6],
@@ -113,7 +114,7 @@ function render() {
             );
         else {
             if (player.use.frame == 6) {
-                player.use = null
+                player.use = null;
             } else {
                 ctx.drawImage(
                     textures.sword[+player.use.right][player.use.frame],
@@ -125,8 +126,16 @@ function render() {
                 player.use.frame++;
             }
         }
+        //! отображение самочуствия нашего ребенка
+        let current_hp = (player.hp / 100) * 16;
+        let hp_line_x = player.x - 8;
+        let hp_line_y = player.y - 18;
+        ctx.fillStyle = "white";
+        ctx.fillRect(hp_line_x, hp_line_y, current_hp, 1.8);
+        ctx.strokeStyle = "white"; // Обводка
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(hp_line_x, hp_line_y, 16, 2);
     }
-
 
     // ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
 }
@@ -189,16 +198,14 @@ function addEventListeners() {
         if (!event.button) {
             socket.send("use");
         }
-    })
-
+    });
     // socket.addEventListener("open", (event) => {});
     loadTextures();
     socket.addEventListener("message", (event) => {
         let msg = event.data.split(":");
-        let player = players[msg[1]]
-        if (!player)
-            player = players[msg[1]] = new Player()
-        let cmd = msg[2]
+        let player = players[msg[1]];
+        if (!player) player = players[msg[1]] = new Player();
+        let cmd = msg[2];
         if (cmd == "pos") {
             [x, y] = msg[3].split(",");
             player.x = x;
@@ -206,10 +213,11 @@ function addEventListeners() {
         } else if (cmd == "vec") {
             [x, y] = msg[3].split(",");
             player.state = x != 0 || y != 0;
-            if (x != 0)
-                player.right = x == 1;
+            if (x != 0) player.right = x == 1;
         } else if (cmd == "use") {
-            player.use = new SwordUse(+player.right)
+            player.use = new SwordUse(+player.right);
+        } else if (cmd == "hp") {
+            player.hp = parseInt(msg[3]);
         }
         console.log(event.data);
         // render();
