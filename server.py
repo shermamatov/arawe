@@ -105,4 +105,5 @@ class Server(WebSocketEndpoint):
     
     async def on_disconnect(self, ws, close_code):
         player = self.players.pop(ws)
+        self.players.remove(player)
         await self.send_all(f"{player}:hp:0")
