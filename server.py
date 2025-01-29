@@ -25,9 +25,6 @@ class Server(WebSocketEndpoint):
     height = 640
     players: dict[WebSocket, Player] = {}
 
-    async def del_player(self, player):
-        await self.send_all(f"{player}:hp:0")
-
     @classmethod
     async def send_all(cls, msg: str):
         for ws in cls.players:
@@ -42,11 +39,20 @@ class Server(WebSocketEndpoint):
                 if enemy is player:
                     continue
 
+                px0 = player.x
                 px1 = player.x + 16 * player.dir
                 py0 = player.y - 16
                 py1 = player.y + 16
 
-                # TODO: not done
+                ex0 = enemy.x - 8
+                ex1 = enemy.x + 8
+                ey0 = enemy.y - 16
+                ey1 = enemy.y + 16
+
+                if (((px0 <= ex0 and ex0 <= px1) or (px0 <= ex1 and ex1 <= px1))
+                    and (py0 <= ey0 and ey0 <= py1) or (py0 <= ey1 and ey1 <= py1)):
+                    enemy.hp -= 10
+                    await self.send_all(player.get_hp())
                 
 
     async def get_state(self):
@@ -91,4 +97,5 @@ class Server(WebSocketEndpoint):
             await self.send_all(player.get_vector())
     
     async def on_disconnect(self, ws, close_code):
-        await self.del_player(ws)
+        player = self.players.pop(ws)
+        await self.send_all(f"{player}:hp:0")
