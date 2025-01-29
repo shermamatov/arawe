@@ -19,6 +19,7 @@ class Player {
     state = 0;
     right = 0;
     use = null;
+    hp = 10;
 }
 
 class SwordUse {
@@ -125,6 +126,15 @@ function render() {
                 player.use.frame++;
             }
         }
+        //! отображение самочуствия нашего ребенка
+        let current_hp = (player.hp / 100) * 16;
+        let hp_line_x = player.x - 8;
+        let hp_line_y = player.y - 18;
+        ctx.fillStyle = "white";
+        ctx.fillRect(hp_line_x, hp_line_y, current_hp, 1.8);
+        ctx.strokeStyle = "white"; // Обводка
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(hp_line_x, hp_line_y, 16, 2);
     }
 
     // ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
@@ -189,7 +199,6 @@ function addEventListeners() {
             socket.send("use");
         }
     });
-
     // socket.addEventListener("open", (event) => {});
     loadTextures();
     socket.addEventListener("message", (event) => {
@@ -207,6 +216,8 @@ function addEventListeners() {
             if (x != 0) player.right = x == 1;
         } else if (cmd == "use") {
             player.use = new SwordUse(+player.right);
+        } else if (cmd == "hp") {
+            player.hp = parseInt(msg[3]);
         }
         console.log(event.data);
         // render();
