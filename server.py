@@ -35,7 +35,7 @@ class Server(WebSocketEndpoint):
             player.use = 16
             await self.send_all(f"{player}:use")
 
-            for enemy in self.players:
+            for enemy in self.players.values():
                 if enemy is player:
                     continue
 
