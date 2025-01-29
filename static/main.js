@@ -14,31 +14,21 @@ let frame = 0;
 //!  constants end
 
 class Player {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.state = 0;
-    }
-    // item:
-    // dx: 0,
-    // dy: 1,
-    use() {
-        // ...
+    x = null;
+    y = null;
+    state = 0;
+    right = 0;
+    use = null;
+}
+
+class SwordUse {
+    constructor(right) {
+        this.right = right;
+        this.frame = 0;
     }
 }
 
-class Object {}
-
-class Shells {}
-const clientId = null;
-const player = {
-    x: 128,
-    y: 128,
-    state: 0,
-
-    dx: 0,
-};
-// let player = new Player();
+const players = {};
 const shells = {};
 const objects = {};
 const items = {};
@@ -51,24 +41,36 @@ const movement = {
 };
 
 const textures = {
-    player_staying: [],
-    player_running: [],
-    enemy: [],
+    player_staying: [[], []],
+    player_running: [[], []],
+    sword: [[], []],
 };
 
 function loadTextures() {
     let img;
     for (let i = 1; i < 7; i++) {
         img = new Image();
-        img.src = "/static/img/Dacer/Dacer_Standing" + i + ".png";
-        textures.player_staying.push(img);
+        img.src = "/static/img/Dacer/Dacer_Standing_Left" + i + ".png";
+        textures.player_staying[0].push(img);
         img = new Image();
-        img.src = "/static/img/Dacer/Dacer_Runing" + i + ".png";
-        textures.player_running.push(img);
+        img.src = "/static/img/Dacer/Dacer_Standing_Right" + i + ".png";
+        textures.player_staying[1].push(img);
+        img = new Image();
+        img.src = "/static/img/Dacer/Dacer_Runing_Left" + i + ".png";
+        textures.player_running[0].push(img);
+        img = new Image();
+        img.src = "/static/img/Dacer/Dacer_Runing_Right" + i + ".png";
+        textures.player_running[1].push(img);
+        img = new Image();
+        img.src = "/static/img/weapoons/blade_Left_OF" + i + ".png";
+        textures.sword[0].push(img);
+        img = new Image();
+        img.src = "/static/img/weapoons/blade_RIght_OF" + i + ".png";
+        textures.sword[1].push(img);
         // enemy.textures.push(img)
     }
 
-    for (let i = 1; i < 7; i++) {}
+    // for (let i = 1; i < 7; i++) {}
     // console.log(player);
     // const image = new Image();
     // image.src = "/static/img/baground/Tree.png";
@@ -81,23 +83,50 @@ function render() {
     ctx.fillStyle = "#0fef7f";
     // console.log(player);
 
-    if (player.state)
-        ctx.drawImage(
-            textures.player_running[frame % 6],
-            player.x,
-            player.y,
-            32,
-            32
-        );
-    else
-        ctx.drawImage(
-            textures.player_staying[frame % 6],
-            player.x,
-            player.y,
-            32,
-            32
-        );
-    ctx.restore();
+    let player;
+    for (const id of Object.keys(players)) {
+        player = players[id];
+        if (player.state)
+            ctx.drawImage(
+                textures.player_running[+player.right][frame % 6],
+                player.x - 16,
+                player.y - 16,
+                32,
+                32
+            );
+        else
+            ctx.drawImage(
+                textures.player_staying[+player.right][frame % 6],
+                player.x - 16,
+                player.y - 16,
+                32,
+                32
+            );
+
+        if (!player.use)
+            ctx.drawImage(
+                textures.sword[+player.right][0],
+                player.x - 16,
+                player.y - 16,
+                32,
+                32
+            );
+        else {
+            if (player.use.frame == 6) {
+                player.use = null;
+            } else {
+                ctx.drawImage(
+                    textures.sword[+player.use.right][player.use.frame],
+                    player.x - 16,
+                    player.y - 16,
+                    32,
+                    32
+                );
+                player.use.frame++;
+            }
+        }
+    }
+
     // ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
 }
 
@@ -155,30 +184,37 @@ function addEventListeners() {
         // send_vector();
     });
 
+    document.addEventListener("mousedown", (event) => {
+        if (!event.button) {
+            socket.send("use");
+        }
+    });
+
     // socket.addEventListener("open", (event) => {});
     loadTextures();
     socket.addEventListener("message", (event) => {
         let msg = event.data.split(":");
-        if (msg.length === 4) {
-            if (msg[2] == "pos") {
-                [x, y] = msg[3].split(",");
-                player.x = x;
-                player.y = y;
-            } else if (msg[2] == "vec") {
-                [x, y] = msg[3].split(",");
-                player.state = x != 0 || y != 0;
-                player.dx = x;
-            }
-        } else if (msg.length == 2) {
-            clientId = msg[1];
+        let player = players[msg[1]];
+        if (!player) player = players[msg[1]] = new Player();
+        let cmd = msg[2];
+        if (cmd == "pos") {
+            [x, y] = msg[3].split(",");
+            player.x = x;
+            player.y = y;
+        } else if (cmd == "vec") {
+            [x, y] = msg[3].split(",");
+            player.state = x != 0 || y != 0;
+            if (x != 0) player.right = x == 1;
+        } else if (cmd == "use") {
+            player.use = new SwordUse(+player.right);
         }
-        // console.log(event.data);
-        render();
+        console.log(event.data);
+        // render();
     });
 }
 
 function addIntervals() {
-    setInterval(() => render(), 16);
+    setInterval(() => render(), 32);
     setInterval(() => {
         if (frame == 5) {
             frame = 0;
