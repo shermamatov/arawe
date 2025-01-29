@@ -18,12 +18,12 @@ class Player {
     y = null;
     state =  0;
     right = 0;
+    use = null
 }
 
 class SwordUse {
-    constructor(right, player) {
+    constructor(right) {
         this.right = right
-        this.player = player
         this.frame = 0;
     }
 }
@@ -32,7 +32,6 @@ const players = {};
 const shells = {};
 const objects = {};
 const items = {};
-const events = [];
 
 const movement = {
     forward: false,
@@ -63,10 +62,10 @@ function loadTextures() {
         img.src = "/static/img/Dacer/Dacer_Runing_Right" + i + ".png";
         textures.player_running[1].push(img);
         img = new Image();
-        img.src = "/static/img/weapoons/bladE_Left" + i + ".png";
+        img.src = "/static/img/weapoons/blade_Left_OF" + i + ".png";
         textures.sword[0].push(img);
         img = new Image();
-        img.src = "/static/img/weapoons/blade_Righ" + i + ".png";
+        img.src = "/static/img/weapoons/blade_RIght_OF" + i + ".png";
         textures.sword[1].push(img);
         // enemy.textures.push(img)
     }
@@ -90,38 +89,44 @@ function render() {
         if (player.state)
             ctx.drawImage(
                 textures.player_running[+player.right][frame % 6],
-                player.x,
-                player.y,
+                player.x - 16,
+                player.y - 16,
                 32,
                 32
             );
         else
             ctx.drawImage(
                 textures.player_staying[+player.right][frame % 6],
-                player.x,
-                player.y,
+                player.x - 16,
+                player.y - 16,
                 32,
                 32
             );
-    }
 
-    for (let i = 0; i < events.length;) {
-        let event = events[i]
-        // console.log(+event.player.right, event.frame)
-        if (event.frame == 6) {
-            events.pop(i)
-        } else {
+        if (!player.use)
             ctx.drawImage(
-                textures.sword[+event.right][event.frame],
-                player.x,
-                player.y,
+                textures.sword[+player.right][0],
+                player.x - 16,
+                player.y - 16,
                 32,
                 32
             );
-            event.frame++;
-            i++
+        else {
+            if (player.use.frame == 6) {
+                player.use = null
+            } else {
+                ctx.drawImage(
+                    textures.sword[+player.use.right][player.use.frame],
+                    player.x - 16,
+                    player.y - 16,
+                    32,
+                    32
+                );
+                player.use.frame++;
+            }
         }
     }
+
 
     // ctx.drawImage(enemy.textures[0], enemy.x, enemy.y, 64, 64);
 }
@@ -204,9 +209,9 @@ function addEventListeners() {
             if (x != 0)
                 player.right = x == 1;
         } else if (cmd == "use") {
-            events.push(new SwordUse(+player.right, player))
+            player.use = new SwordUse(+player.right)
         }
-        // console.log(event.data);
+        console.log(event.data);
         // render();
     });
 }

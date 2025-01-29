@@ -1,6 +1,6 @@
-# Awe
+# Arawe
 
-Future domain: awe.dayrain.uk
+Future domain: arawe.dayrain.uk
 
 ## Protocol 
 
