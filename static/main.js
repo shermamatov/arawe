@@ -31,14 +31,14 @@ class Object {}
 
 class Shells {}
 const clientId = null;
-// const player = {
-//     x: 128,
-//     y: 128,
-//     state: 0,
+const player = {
+    x: 128,
+    y: 128,
+    state: 0,
 
-//     dx: 0,
-
-const player = Player;
+    dx: 0,
+};
+// let player = new Player();
 const shells = {};
 const objects = {};
 const items = {};
