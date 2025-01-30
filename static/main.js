@@ -9,7 +9,7 @@ const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 ctx.scale(4, 4);
 
-const socket = new WebSocket("wss://arawe-production.up.railway.app/ws");
+const socket = new WebSocket("ws://" + document.location.host);
 let frame = 0;
 //!  constants end
 
