@@ -218,6 +218,8 @@ function addEventListeners() {
             player.use = new SwordUse(+player.right);
         } else if (cmd == "hp") {
             player.hp = parseInt(msg[3]);
+            if (!player.hp)
+                delete players[msg[1]]
         }
         console.log(event.data);
         // render();
