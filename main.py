@@ -8,7 +8,7 @@ from starlette.staticfiles import StaticFiles
 from starlette.endpoints import WebSocketEndpoint
 
 from server import Server
-
+import uvicorn
 
 async def index(request):
     return FileResponse("index.html")
@@ -29,5 +29,6 @@ app = Starlette(
     ),
     lifespan=lifespan
 )
-import uvicorn
-uvicorn.run(app, host="0.0.0.0", port=8080)
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
